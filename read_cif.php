@@ -149,7 +149,7 @@ foreach( $files as $file )
         	break;
 
         	case "QT":
-        		$helper = new DataHelper( "tblJourneyOrigin", "JourneyOriginID" );
+        		$helper = new DataHelper( "tblJourneyDestination", "JourneyDestinationID" );
 				$helper->data[ 'UniqueJourneyIdentifier' ] = $lastJourney;
 				$helper->data[ 'Location' ] = substr( $line, 2, 12 );
 				$helper->data[ 'ArrivalTime' ] = ParseTime( substr( $line, 14, 4 ) );
