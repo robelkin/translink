@@ -179,7 +179,7 @@ function ParseDate( $date )
 {
 	$year = substr( $date, 0, 4 );
     $month = substr( $date, 4, 2 );
-    $day = substr( $date, 4, 2 );
+    $day = substr( $date, 6, 2 );
 
     return $year."-".$month."-".$day;
 }
