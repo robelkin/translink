@@ -11,13 +11,13 @@ $fh = fopen( $file, "r" );
 
 while( $line = fgets( $fh ) )
 {
-	#cuts off odd line-numbering at beginning of lines. Not sure what it's doing there.
+	#cuts off line-numbering at beginning of lines. Not sure what it's doing there.
 	$line = substr ($line, -82, 80)
 	
 	if( stripos( $line, "hd" ) !== false )
 	{
-		$date = ParseDate( substr( $line, 22, 6 ) ); #fix func
-		$time = ParseTime( substr( $line, 28, 4 ) ); #fix func
+		$date = ParseDate( substr( $line, 22, 6 ) );
+		$time = ParseTime( substr( $line, 28, 4 ) );
 
 		$helper = new DataHelper( "tblImportHistory", "ImportHistoryID" );
 		$helper->data[ 'FileDate' ] = $date." ".$time;
@@ -33,7 +33,6 @@ while( $line = fgets( $fh ) )
 	{
 		case "BS":
 			$helper = new DataHelper( "tblJourney", "UniqueJourneyIdentifier" );
-			#$helper->data[ 'Operator' ] = substr( $line, 3, 4 );
 			$helper->data[ 'UniqueJourneyIdentifier' ] = substr( $line, 3, 6 );
 			$helper->data[ 'FirstDateOfOperation' ] = ParseDate( substr( $line, 9, 6 ) );
 			$helper->data[ 'LastDateOfOperation' ] = ParseDate( substr( $line, 15, 6 ) );
@@ -44,20 +43,6 @@ while( $line = fgets( $fh ) )
 			$helper->data[ 'OperatesOnFridays' ] =  substr( $line, 25, 1 );
 			$helper->data[ 'OperatesOnSaturdays' ] =  substr( $line, 26, 1 );
 			$helper->data[ 'OperatesOnSundays' ] =  substr( $line, 27, 1 );
-
-			$schoolTermTime = substr( $line, 36, 1 );
-			if( $schoolTermTime == "S" )
-			{
-				$helper->data[ 'SchoolTermTime' ] = "School Term Only";
-			}
-			elseif( $schoolTermTime == "H" )
-			{
-				$helper->data[ 'SchoolTermTime' ] = "School Holidays Only";
-			}
-			else
-			{
-				$helper->data[ 'SchoolTermTime' ] = "";
-			}
 
 			$bankHolidays = substr( $line, 28, 1 );
 			if( $bankHolidays == "X" )
@@ -140,22 +125,6 @@ while( $line = fgets( $fh ) )
 			$lastJourney = $helper->data[ 'UniqueJourneyIdentifier' ];
 		break;
 #BX lines contain little useful data - possibly train monitoring
-		/*case "QE":
-			$helper = new DataHelper( "tblJourneyDateRunning", "JourneyDateRunningID" );
-			$helper->data[ 'UniqueJourneyIdentifier' ] = $lastJourney;
-			$helper->data[ 'StartOfExceptionalPeriod' ] = ParseDate( substr( $line, 2, 8 ) );
-			$helper->data[ 'EndOfExceptionalPeriod' ] = ParseDate( substr( $line, 10, 8 ) );
-			$helper->data[ 'OperationCode' ] = substr( $line, 18, 1 );
-			$helper->SaveRecord();
-		break;
-
-		case "QN":
-			$helper = new DataHelper( "tblJourneyNote", "JourneyNoteID" );
-			$helper->data[ 'UniqueJourneyIdentifier' ] = $lastJourney;
-			$helper->data[ 'NoteCode' ] = substr( $line, 2, 5 );
-			$helper->data[ 'NoteText' ] = substr( $line, 7 );
-			$helper->SaveRecord();
-		break;*/
 
 		case "LO":
 			$helper = new DataHelper( "tblJourneyOrigin", "JourneyOriginID" );
@@ -165,9 +134,9 @@ while( $line = fgets( $fh ) )
 			$helper->data[ 'PublicDeparture' ] = ParseTime( substr( $line, 15, 4 ) );
 			$helper->data[ 'Platform' ] = substr( $line, 19, 3 );
 			$helper->data[ 'Line' ] = substr( $line, 22, 3 );
-			#$helper->data[ 'EngineeringAllowance' ] = substr( $line, 25, 2 ); #appears unused
-			#$helper->data[ 'PathingAllowance' ] = substr( $line, 27, 2 ); #appears unused
-			#$helper->data[ 'PerformanceAllowance' ] = substr( $line, 41, 2 ); #appears unused
+			$helper->data[ 'EngineeringAllowance' ] = ParseWait( $line, 25, 2 ); #appears unused
+			$helper->data[ 'PathingAllowance' ] = ParseWait( $line, 27, 2 ); #appears unused
+			$helper->data[ 'PerformanceAllowance' ] = ParseWait( $line, 41, 2 ); #appears unused
 			$helper->data[ 'Activity' ] = substr( $line, 29, 12 );
 			$helper->SaveRecord();
 		break;
@@ -176,45 +145,24 @@ while( $line = fgets( $fh ) )
 			$helper = new DataHelper( "tblJourneyIntermediate", "JourneyIntermediateID" );
 			$helper->data[ 'UniqueJourneyIdentifier' ] = $lastJourney;
 			$helper->data[ 'Location' ] = substr( $line, 2, 8 );
-			$helper->data[ 'ScheduledArrival' ] = ParseTime( substr( $line, 10, 5 ) );		#These 5 char time fields
-			$helper->data[ 'ScheduledDeparture' ] = ParseTime( substr( $line, 15, 5 ) );	#allow for half-minutes. 
-			$helper->data[ 'ScheduledPass' ] = ParseTime( substr( $line, 20, 5 ) );			#Any thoughts on dealing with this?
+			$helper->data[ 'ScheduledArrival' ] = ParseTime( substr( $line, 10, 5 ) );	
+			$helper->data[ 'ScheduledDeparture' ] = ParseTime( substr( $line, 15, 5 ) );
+			$helper->data[ 'ScheduledPass' ] = ParseTime( substr( $line, 20, 5 ) );	
 			$helper->data[ 'PublicArrival' ] = ParseTime( substr( $line, 25, 4 ) );
 			$helper->data[ 'PublicDeparture' ] = ParseTime( substr( $line, 29, 4 ) );
 			$helper->data[ 'Platform' ] = substr( $line, 33, 3 );
 			$helper->data[ 'Line' ] = substr( $line, 36, 3 );
 			$helper->data[ 'Path' ] = substr( $line, 39, 3 );
-			#$helper->data[ 'EngineeringAllowance' ] = substr( $line, 54, 2 ); #appears unused
-			#$helper->data[ 'PathingAllowance' ] = substr( $line, 56, 2 ); #appears unused
-			#$helper->data[ 'PerformanceAllowance' ] = substr( $line, 58, 2 ); #appears unused
+			$helper->data[ 'EngineeringAllowance' ] = ParseWait( substr( $line, 54, 2 ) ); #appears unused
+			$helper->data[ 'PathingAllowance' ] = ParseWait( substr( $line, 56, 2 ) ); #appears unused
+			$helper->data[ 'PerformanceAllowance' ] = ParseWait( substr( $line, 58, 2 ) ); #appears unused
 
 			$helper->data[ 'Activity'] = substr( $line, 42, 12 );	#will parse later.
-			/*if( $activity == "B" )
-			{
-				$helper->data[ 'Activity' ] = "Pick up and Set down";
-			}
-			elseif( $activity == "P" )
-			{
-				$helper->data[ 'Activity' ] = "Pick up'";
-			}
-			elseif( $activity == "S" )
-			{
-				$helper->data[ 'Activity' ] = "Set down";
-			}
-			elseif( $activity == "N" )
-			{
-				$helper->data[ 'Activity' ] = "Neither";
-			}
-			else
-			{
-				$helper->data[ 'Activity' ] = "";
-			}
-*/
 			$helper->SaveRecord();
 		break;
 
 		case "LT":
-			$helper = new DataHelper( "tblJourneyOrigin", "JourneyOriginID" );
+			$helper = new DataHelper( "tblJourneyDestination", "JourneyDestinationID" );
 			$helper->data[ 'UniqueJourneyIdentifier' ] = $lastJourney;
 			$helper->data[ 'Location' ] = substr( $line, 2, 8 );
 			$helper->data[ 'ScheduledArrival' ] = ParseTime( substr( $line, 10, 5 ) );
@@ -227,13 +175,28 @@ while( $line = fgets( $fh ) )
 	}
 }
 
+// takes a 2 digit time string with possible 
+// half minutes and creates a mysql string
+function ParseWait( $time )
+{
+	if ( substr( $time, 2, 1 ) == 'H')
+	{
+		return "00:" substr( $time, 1, 1 ). ":30";
+	}
+	else
+	{
+    	return "00:" $time;
+    }
+}
+
+
 // takes a 6 digit date string
 //  and creates a mysql formatted string
 function ParseDate( $date )
 {
 	$day = substr( $date, 0, 2 );
     $month = substr( $date, 2, 2 );
-    $year = substr( $date, 4, 2 );
+    $year = ( substr( $date, 4, 2 ) < 60 ? "20" . substr( $date, 4, 2 ) : "19" . substr( $date, 4, 2 ) );
 
     return $year."-".$month."-".$day;
 }
