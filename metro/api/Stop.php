@@ -1,17 +1,10 @@
-<?
+<?php
 
-class Stop
+class Stop extends Base
 {
 	public function __construct( $data = "", $params = array() )
 	{
-		if( !$data )
-		{
-			throw new Exception( "Invalid Object Requested", 03 );
-		}
-		if( !$params )
-		{
-			throw new Exception( "No Params Supplied", 02 );
-		}
+		parent::__construct( $data, $params );
 		$this->data = $data;
 		$this->params = $params;
 	}
@@ -32,8 +25,15 @@ class Stop
 					print json_encode($data->data);
 					exit;
 				break;
-				case "Routes":
-					
+				case "RoutesForStop":
+					if( !$this->params['stopref'] )
+					{
+						throw new Exception( "Invalid Params passed", 02 );
+					}
+					$sql = sprintf( "SELECT UniqueJourneyIdentifier FROM tblJourneyIntermediate WHERE Location = '%s' GROUP BY UniqueJourneyIdentifier", $this->params['stopref'] );
+					$results = DataHelper::LoadTableFromSql( $sql );
+					print json_encode( $results );
+					exit;
 				break;
 				default:
 					throw new Exception( "Invalid Object Requested", 03 );
