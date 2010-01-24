@@ -31,10 +31,24 @@ class Journey extends Base
 					exit;
 				break;
 				case "RouteOrigin":
-					
+					if( !$this->params['route'] )
+					{
+						throw new Exception( "Invalid Params passed", 02 );
+					}
+					$sql = sprintf("SELECT * FROM tblJourneyOrigin INNER JOIN tblStop ON ( tblJourneyOrigin.Location = tblStop.StopReference ) WHERE UniqueJourneyIdentifier = '%s'", $this->params['route']);
+					$results = DataHelper::LoadTableFromSql( $sql );
+					print json_encode( $results );
+					exit;
 				break;
 				case "RouteDestination":
-					
+					if( !$this->params['route'] )
+					{
+						throw new Exception( "Invalid Params passed", 02 );
+					}
+					$sql = sprintf("SELECT * FROM tblJourneyDestination INNER JOIN tblStop ON ( tblJourneyDestination.Location = tblStop.StopReference ) WHERE UniqueJourneyIdentifier = '%s'", $this->params['route']);
+					$results = DataHelper::LoadTableFromSql( $sql );
+					print json_encode( $results );
+					exit;
 				break;
 				default:
 					throw new Exception( "Invalid Object Requested", 03 );
