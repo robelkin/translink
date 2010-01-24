@@ -35,7 +35,7 @@ class Stop extends Base
 					print json_encode( $results );
 					exit;
 				break;
-				case "StopOnRoute":
+				case "RoutesForStop":
 					if( !$this->params['stopref'] || !$this->params['route'] )
 					{
 						throw new Exception( "Invalid Params passed", 02 );
