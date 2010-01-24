@@ -4,7 +4,7 @@ class Journey extends Base
 {
 	public function __construct( $data = "", $params = array() )
 	{
-		parent::__construct();
+		parent::__construct( $data, $params );
 		$this->data = $data;
 		$this->params = $params;
 	}
@@ -14,8 +14,11 @@ class Journey extends Base
 		{
 			switch( $this->data )
 			{
-				case "Routes":
-					
+				case "AllRoutes":
+					$sql = "SELECT RouteNumber, RunningBoard, UniqueJourneyIdentifier FROM tblJourney";
+					$results = DataHelper::LoadTableFromSql( $sql );
+					print json_encode( $results );
+					exit;
 				break;
 				default:
 					throw new Exception( "Invalid Object Requested", 03 );
