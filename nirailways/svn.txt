@@ -1,3 +1,0 @@
-svn://translink-robelkin@pearl.joyent.us/users/home/robelkin/svn/translink
- username is translink-robelkin
- password is transl1nk!!
