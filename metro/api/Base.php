@@ -14,7 +14,5 @@ class Base
 			throw new Exception( "No Params Supplied", 02 );
 		}
 	}
-	
 }
-
 ?>
