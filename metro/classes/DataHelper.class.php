@@ -20,11 +20,23 @@ class DataHelper
 
     public function LoadRecord( $id )
     {
-    	include_once( "library/db.inc.php" );
+    	include_once( "../library/db.inc.php" );
 
     	$loadSql = "SELECT * FROM $this->table WHERE $this->primaryKeyField = '".mysql_real_escape_string( $id )."'";
     	$loadQuery = mysql_query( $loadSql );
     	$this->data = mysql_fetch_assoc( $loadQuery );
+	}
+	public static function LoadTableFromSql( $sql )
+	{
+		include_once( "../library/db.inc.php" );
+
+    	$loadQuery = mysql_query( $sql );
+		$rows = '';
+		while( $row = mysql_fetch_assoc($loadQuery))
+		{
+			$rows[] = $row;			
+		}
+    	return $rows;
 	}
 
 	public function SaveRecord()
@@ -87,7 +99,7 @@ class DataHelper
 
 	private function GetFields()
 	{
-		include_once( "library/db.inc.php" );
+		include_once( "../library/db.inc.php" );
 
 		$fieldSql = "SHOW COLUMNS FROM $this->table";
 		$fieldQuery = mysql_query( $fieldSql );
