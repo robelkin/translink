@@ -15,7 +15,7 @@ class Journey extends Base
 			switch( $this->data )
 			{
 				case "AllRoutes":
-					$sql = "SELECT RouteNumber, RunningBoard, UniqueJourneyIdentifier FROM tblJourney";
+					$sql = "SELECT RouteNumber, RunningBoard, tblJourney.UniqueJourneyIdentifier, Location AS OriginStop FROM tblJourney INNER JOIN tblJourneyOrigin ON (tblJourney.UniqueJourneyIdentifier = tblJourneyOrigin.UniqueJourneyIdentifier)";
 					$results = DataHelper::LoadTableFromSql( $sql );
 					print json_encode( $results );
 					exit;
