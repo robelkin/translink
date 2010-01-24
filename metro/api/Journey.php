@@ -20,6 +20,22 @@ class Journey extends Base
 					print json_encode( $results );
 					exit;
 				break;
+				case "StopsOnRoute":
+					if( !$this->params['route'] )
+					{
+						throw new Exception( "Invalid Params passed", 02 );
+					}
+					$sql = sprintf("SELECT * FROM tblJourneyIntermediate WHERE UniqueJourneyIdentifier = '%s'", $this->params['route']);
+					$results = DataHelper::LoadTableFromSql( $sql );
+					print json_encode( $results );
+					exit;
+				break;
+				case "RouteOrigin":
+					
+				break;
+				case "RouteDestination":
+					
+				break;
 				default:
 					throw new Exception( "Invalid Object Requested", 03 );
 				break;
