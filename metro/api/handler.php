@@ -2,6 +2,7 @@
 
 include_once("../library/db.inc.php");
 include_once("../classes/DataHelper.class.php");
+include_once("Base.php");
 
 try
 {
