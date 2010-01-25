@@ -2,10 +2,9 @@
 
 set_time_limit( 0 );
 
-include_once( "classes/DataHelper.class.php" );
-
+include_once( "../../classes/DataHelper.class.php" );
 // get the files
-$files = glob( "./data/*" );
+$files = glob( "../../data/metro/*" );
 
 foreach( $files as $file )
 {
