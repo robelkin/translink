@@ -1,0 +1,11 @@
+read_cif.php
+	Parse data not used by Translink:
+		BX lines
+		CR lines
+		TN lines
+		LN lines
+		AA lines
+		TI lines
+		TA lines
+		TD lines
+	Parse ZZ lines

@@ -2,7 +2,7 @@
 
 set_time_limit( 0 );
 
-include_once( "classes/DataHelper.class.php" );
+include_once( "../../classes/DataHelper.class.php" );
 
 // get the file - entire timetable is in single file
 $file ( 'nir.CIF' );
@@ -14,7 +14,7 @@ while( $line = fgets( $fh ) )
 	#cuts off line-numbering at beginning of lines. Not sure what it's doing there.
 	$line = substr ($line, -82, 80)
 	
-	if( stripos( $line, "hd" ) !== false )
+	if( stripos( $line, "HD" ) !== false )
 	{
 		$date = ParseDate( substr( $line, 22, 6 ) );
 		$time = ParseTime( substr( $line, 28, 4 ) );
@@ -110,17 +110,17 @@ while( $line = fgets( $fh ) )
 
 			$helper->data[ 'TrainCategory' ] =  substr( $line, 30, 2 );
 			$helper->data[ 'TrainIdentity' ] =  substr( $line, 32, 4 );
-			#$helper->data[ 'Headcode' ] =  substr( $line, 36, 4 ); #appears to be unused
-			#$helper->data[ 'TrainServiceCode' ] =  substr( $line, 41, 8 ); #appears to be unused
-			#$helper->data[ 'BusinessSector' ] =  substr( $line, 49, 1 ); #appears to be unused
-			#$helper->data[ 'PowerType' ] =  substr( $line, 50, 3 ); #appears to be unused
-			#$helper->data[ 'PowerType' ] =  substr( $line, 50, 3 ); #appears to be unused - value doesn't match spec
-			#$helper->data[ 'TimingLoad' ] =  substr( $line, 53, 4 ); #appears to be unused
-			#$helper->data[ 'Speed' ] =  substr( $line, 57, 3 ); #appears to be unused
-			#$helper->data[ 'OperatingCharacteristics' ] =  substr( $line, 57, 3 ); #appears to be unused
-			#$helper->data[ 'Class' ] =  substr( $line, 66, 1 ); #appears to be unused - apparently all trains have first class & standard seating...
+			$helper->data[ 'Headcode' ] =  substr( $line, 36, 4 ); #appears to be unused
+			$helper->data[ 'TrainServiceCode' ] =  substr( $line, 41, 8 ); #appears to be unused
+			$helper->data[ 'BusinessSector' ] =  substr( $line, 49, 1 ); #appears to be unused
+			$helper->data[ 'PowerType' ] =  substr( $line, 50, 3 ); #appears to be unused
+			$helper->data[ 'PowerType' ] =  substr( $line, 50, 3 ); #appears to be unused - value doesn't match spec
+			$helper->data[ 'TimingLoad' ] =  substr( $line, 53, 4 ); #appears to be unused
+			$helper->data[ 'Speed' ] =  substr( $line, 57, 3 ); #appears to be unused
+			$helper->data[ 'OperatingCharacteristics' ] =  substr( $line, 57, 3 ); #appears to be unused
+			$helper->data[ 'Class' ] =  substr( $line, 66, 1 ); #appears to be unused - apparently all trains have first class & standard seating
 			#lots of unused things, unset things
-			#$helper->data[ 'STPIndicator' ] =  substr( $line, 79, 1 ); #appears to be unused
+			$helper->data[ 'STPIndicator' ] =  substr( $line, 79, 1 ); #appears to be unused
 			$helper->SaveRecord();
 			$lastJourney = $helper->data[ 'UniqueJourneyIdentifier' ];
 		break;
@@ -134,9 +134,9 @@ while( $line = fgets( $fh ) )
 			$helper->data[ 'PublicDeparture' ] = ParseTime( substr( $line, 15, 4 ) );
 			$helper->data[ 'Platform' ] = substr( $line, 19, 3 );
 			$helper->data[ 'Line' ] = substr( $line, 22, 3 );
-			$helper->data[ 'EngineeringAllowance' ] = ParseWait( $line, 25, 2 ); #appears unused
-			$helper->data[ 'PathingAllowance' ] = ParseWait( $line, 27, 2 ); #appears unused
-			$helper->data[ 'PerformanceAllowance' ] = ParseWait( $line, 41, 2 ); #appears unused
+			$helper->data[ 'EngineeringAllowance' ] = ParseWait( $line, 25, 2 );
+			$helper->data[ 'PathingAllowance' ] = ParseWait( $line, 27, 2 );
+			$helper->data[ 'PerformanceAllowance' ] = ParseWait( $line, 41, 2 );
 			$helper->data[ 'Activity' ] = substr( $line, 29, 12 );
 			$helper->SaveRecord();
 		break;
@@ -153,9 +153,9 @@ while( $line = fgets( $fh ) )
 			$helper->data[ 'Platform' ] = substr( $line, 33, 3 );
 			$helper->data[ 'Line' ] = substr( $line, 36, 3 );
 			$helper->data[ 'Path' ] = substr( $line, 39, 3 );
-			$helper->data[ 'EngineeringAllowance' ] = ParseWait( substr( $line, 54, 2 ) ); #appears unused
-			$helper->data[ 'PathingAllowance' ] = ParseWait( substr( $line, 56, 2 ) ); #appears unused
-			$helper->data[ 'PerformanceAllowance' ] = ParseWait( substr( $line, 58, 2 ) ); #appears unused
+			$helper->data[ 'EngineeringAllowance' ] = ParseWait( substr( $line, 54, 2 ) );
+			$helper->data[ 'PathingAllowance' ] = ParseWait( substr( $line, 56, 2 ) );
+			$helper->data[ 'PerformanceAllowance' ] = ParseWait( substr( $line, 58, 2 ) );
 
 			$helper->data[ 'Activity'] = substr( $line, 42, 12 );	#will parse later.
 			$helper->SaveRecord();
