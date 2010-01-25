@@ -5,7 +5,7 @@ set_time_limit( 0 );
 include_once( "../../classes/DataHelper.class.php" );
 // get the files
 $files = glob( "../../data/metro/*" );
-print_r($files);
+
 foreach( $files as $file )
 {
     $fh = fopen( $file, "r" );
