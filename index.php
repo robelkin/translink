@@ -1,6 +1,6 @@
 <?
 
-include_once("/library/db.inc.php");
+include_once("library/db.inc.php");
 
 print "Current host selected in settings.ini:".$settings[ 'dbHost' ]."<br />";
 print "Current database selected in settings.ini".$settings[ 'dbDatabase' ]."<br />";
