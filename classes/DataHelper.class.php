@@ -45,7 +45,7 @@ class DataHelper
 
 		$existsSql = "SELECT COUNT(*) FROM $this->table WHERE $this->primaryKeyField = '".mysql_real_escape_string( $this->data[ $this->primaryKeyField ] )."'";
 		$existsQuery = mysql_query( $existsSql );
-		$exists = mysql_result( $existsQuery );
+		$exists = mysql_result( $existsQuery, 0 );
 
 		if( $exists > 0 )
 		{
