@@ -1,11 +1,10 @@
 <?php
-
+error_reporting(E_ALL);
 set_time_limit( 0 );
 
-include_once( "classes/DataHelper.class.php" );
-
+include_once( "../../classes/DataHelper.class.php" );
 // get the files
-$files = glob( "./data/*" );
+$files = glob( "../../data/metro/*" );
 
 foreach( $files as $file )
 {
@@ -25,7 +24,6 @@ foreach( $files as $file )
 
             continue;
         }
-
         $headerCode = substr( $line, 0, 2 );
 
         switch( $headerCode )
@@ -82,6 +80,7 @@ foreach( $files as $file )
         		$helper->data[ 'RegistrationNumber' ] =  substr( $line, 56, 8 );
         		$helper->data[ 'RouteDirection' ] =  substr( $line, 64, 1 );
         		$helper->SaveRecord();
+
         		$lastJourney = $helper->data[ 'UniqueJourneyIdentifier' ];
         	break;
 

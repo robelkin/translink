@@ -20,7 +20,7 @@ class DataHelper
 
     public function LoadRecord( $id )
     {
-    	include_once( "../library/db.inc.php" );
+    	include_once( "../../library/db.inc.php" );
 
     	$loadSql = "SELECT * FROM $this->table WHERE $this->primaryKeyField = '".mysql_real_escape_string( $id )."'";
     	$loadQuery = mysql_query( $loadSql );
@@ -28,7 +28,7 @@ class DataHelper
 	}
 	public static function LoadTableFromSql( $sql )
 	{
-		include_once( "../library/db.inc.php" );
+		include_once( "../../library/db.inc.php" );
 
     	$loadQuery = mysql_query( $sql );
 		$rows = '';
@@ -41,11 +41,11 @@ class DataHelper
 
 	public function SaveRecord()
 	{
-		include_once( "library/db.inc.php" );
+		include_once( "../../library/db.inc.php" );
 
 		$existsSql = "SELECT COUNT(*) FROM $this->table WHERE $this->primaryKeyField = '".mysql_real_escape_string( $this->data[ $this->primaryKeyField ] )."'";
 		$existsQuery = mysql_query( $existsSql );
-		$exists = mysql_result( $existsQuery );
+		$exists = mysql_result( $existsQuery, 0 );
 
 		if( $exists > 0 )
 		{
@@ -99,7 +99,7 @@ class DataHelper
 
 	private function GetFields()
 	{
-		include_once( "../library/db.inc.php" );
+		include_once( "../../library/db.inc.php" );
 
 		$fieldSql = "SHOW COLUMNS FROM $this->table";
 		$fieldQuery = mysql_query( $fieldSql );

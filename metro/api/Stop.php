@@ -35,16 +35,6 @@ class Stop extends Base
 					print json_encode( $results );
 					exit;
 				break;
-				case "RoutesForStop":
-					if( !$this->params['stopref'] || !$this->params['route'] )
-					{
-						throw new Exception( "Invalid Params passed", 02 );
-					}
-					$sql = sprintf( "SELECT * FROM tblJourneyIntermediate INNER JOIN tblStop ON (tblJourneyIntermediate.Location = tblStop.StopReference) WHERE Location = '%s' AND UniqueJourneyIdentifier = '%s'", $this->params['stopref'], $this->params['route'] );
-					$results = DataHelper::LoadTableFromSql( $sql );
-					print json_encode( $results );
-					exit;
-				break;
 				case "NearestStop":
 					if( !$this->params['lat'] || !$this->params['long'] )
 					{
