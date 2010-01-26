@@ -16,6 +16,10 @@ class Stop extends Base
 			switch( $this->data )
 			{
 				case "IndividualStop":
+					// deprecated - see default case below
+					// want to keep url as tidy as possible
+					// will be removed at some stage
+					// @robertfalconer
 					if( !$this->params['stopref'] )
 					{
 						throw new Exception( "Invalid Params passed", 02 );
@@ -36,17 +40,27 @@ class Stop extends Base
 					exit;
 				break;
 				case "NearestStop":
-					if( !$this->params['lat'] || !$this->params['long'] )
+					if( !$this->params['lat'] || !$this->params['long'] || !$this->params['distance'] )
 					{
 						throw new Exception( "Invalid Params pass", 02 );
 					}
 					$sql = sprintf( "SELECT StopID, StopName, 3963.191 * ACOS( (
-SIN( PI( ) * '%1$s' /180 ) * SIN( PI( ) * StopLat /180 ) ) + ( COS( PI( ) * '%1$s' /180 ) * COS( PI( ) * StopLat /180 ) * COS( PI( ) * StopLong /180 - PI( ) * - '%2$s' /180 ) ) ) AS distance FROM tblStop ORDER BY distance LIMIT 0 , 30", $this->params['lat'], $this->params['long']);
+SIN( PI( ) * '%1$d' /180 ) * SIN( PI( ) * StopLat /180 ) ) + ( COS( PI( ) * '%1$d' /180 ) * COS( PI( ) * StopLat /180 ) * COS( PI( ) * StopLong /180 - PI( ) * - '%2$d' /180 ) ) ) AS distance FROM tblStop WHERE distance < '%3$d' ORDER BY distance LIMIT 0 , 30", $this->params['lat'], $this->params['long'], $this->params['distance'] );
 					$results = DataHelper::LoadTableFromSql( $sql );
 					print json_encode( $results);
 					exit;
 				default:
-					throw new Exception( "Invalid Object Requested", 03 );
+					if( is_numeric( $this->data ) )
+					{
+						$data = new DataHelper( "tblStop", "StopReference" );
+						$data->LoadRecord( $this->data );
+						print json_encode( $data->data );
+						exit;
+					}
+					else
+					{	
+						throw new Exception( "Invalid Object Requested", 03 );
+					}
 				break;
 			}
 
