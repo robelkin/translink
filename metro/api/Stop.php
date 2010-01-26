@@ -36,7 +36,7 @@ class Stop extends Base
 					exit;
 				break;
 				case "NearestStop":
-					if( !$this->params['lat'] || !$this->params['long'] )
+					if( !$this->params['lat'] || !$this->params['long'] || !$this->params['distance'] )
 					{
 						throw new Exception( "Invalid Params pass", 02 );
 					}
