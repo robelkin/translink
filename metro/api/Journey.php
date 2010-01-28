@@ -18,8 +18,8 @@ class Journey extends Base
 					$sql = "SELECT RouteNumber, RunningBoard, tblJourney.UniqueJourneyIdentifier, Location AS OriginStop FROM tblJourney INNER JOIN tblJourneyOrigin ON (tblJourney.UniqueJourneyIdentifier = tblJourneyOrigin.UniqueJourneyIdentifier)";
 					$results = DataHelper::LoadTableFromSql( $sql );
 					$resultJson = json_encode( $results );
-					if (isset($_GET['callback'])) {
-						$callback = $_GET['callback'];
+					if (isset($this->params['callback'])) {
+						$callback = $this->params['callback'];
 						echo $callback . '(' . $resultJson . ')';
 					}
 					else {
@@ -35,8 +35,8 @@ class Journey extends Base
 					$sql = sprintf("SELECT * FROM tblJourneyIntermediate WHERE UniqueJourneyIdentifier = '%s'", $this->params['route']);
 					$results = DataHelper::LoadTableFromSql( $sql );
 					$resultJson = json_encode( $results );
-					if (isset($_GET['callback'])) {
-						$callback = $_GET['callback'];
+					if (isset($this->params['callback'])) {
+						$callback = $this->params['callback'];
 						echo $callback . '(' . $resultJson . ')';
 					}
 					else {
@@ -52,8 +52,8 @@ class Journey extends Base
 					$sql = sprintf("SELECT * FROM tblJourneyOrigin INNER JOIN tblStop ON ( tblJourneyOrigin.Location = tblStop.StopReference ) WHERE UniqueJourneyIdentifier = '%s'", $this->params['route']);
 					$results = DataHelper::LoadTableFromSql( $sql );
 					$resultJson = json_encode( $results );
-					if (isset($_GET['callback'])) {
-						$callback = $_GET['callback'];
+					if (isset($this->params['callback'])) {
+						$callback = $this->params['callback'];
 						echo $callback . '(' . $resultJson . ')';
 					}
 					else {
@@ -69,8 +69,8 @@ class Journey extends Base
 					$sql = sprintf("SELECT * FROM tblJourneyDestination INNER JOIN tblStop ON ( tblJourneyDestination.Location = tblStop.StopReference ) WHERE UniqueJourneyIdentifier = '%s'", $this->params['route']);
 					$results = DataHelper::LoadTableFromSql( $sql );
 					$resultJson = json_encode( $results );
-					if (isset($_GET['callback'])) {
-						$callback = $_GET['callback'];
+					if (isset($this->params['callback'])) {
+						$callback = $this->params['callback'];
 						echo $callback . '(' . $resultJson . ')';
 					}
 					else {
