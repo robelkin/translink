@@ -18,8 +18,13 @@ class Journey extends Base
 					$sql = "SELECT RouteNumber, RunningBoard, tblJourney.UniqueJourneyIdentifier, Location AS OriginStop FROM tblJourney INNER JOIN tblJourneyOrigin ON (tblJourney.UniqueJourneyIdentifier = tblJourneyOrigin.UniqueJourneyIdentifier)";
 					$results = DataHelper::LoadTableFromSql( $sql );
 					$resultJson = json_encode( $results );
-					$callback = $_GET['callback'];
-					echo $callback . '(' . $resultJson . ')';
+					if (isset($_GET['callback'])) {
+						$callback = $_GET['callback'];
+						echo $callback . '(' . $resultJson . ')';
+					}
+					else {
+						echo $resultJson;
+					}
 					exit;
 				break;
 				case "StopsOnRoute":
@@ -30,8 +35,13 @@ class Journey extends Base
 					$sql = sprintf("SELECT * FROM tblJourneyIntermediate WHERE UniqueJourneyIdentifier = '%s'", $this->params['route']);
 					$results = DataHelper::LoadTableFromSql( $sql );
 					$resultJson = json_encode( $results );
-					$callback = $_GET['callback'];
-					echo $callback . '(' . $resultJson . ')';
+					if (isset($_GET['callback'])) {
+						$callback = $_GET['callback'];
+						echo $callback . '(' . $resultJson . ')';
+					}
+					else {
+						echo $resultJson;
+					}
 					exit;
 				break;
 				case "RouteOrigin":
@@ -42,8 +52,13 @@ class Journey extends Base
 					$sql = sprintf("SELECT * FROM tblJourneyOrigin INNER JOIN tblStop ON ( tblJourneyOrigin.Location = tblStop.StopReference ) WHERE UniqueJourneyIdentifier = '%s'", $this->params['route']);
 					$results = DataHelper::LoadTableFromSql( $sql );
 					$resultJson = json_encode( $results );
-					$callback = $_GET['callback'];
-					echo $callback . '(' . $resultJson . ')';
+					if (isset($_GET['callback'])) {
+						$callback = $_GET['callback'];
+						echo $callback . '(' . $resultJson . ')';
+					}
+					else {
+						echo $resultJson;
+					}
 					exit;
 				break;
 				case "RouteDestination":
@@ -54,8 +69,13 @@ class Journey extends Base
 					$sql = sprintf("SELECT * FROM tblJourneyDestination INNER JOIN tblStop ON ( tblJourneyDestination.Location = tblStop.StopReference ) WHERE UniqueJourneyIdentifier = '%s'", $this->params['route']);
 					$results = DataHelper::LoadTableFromSql( $sql );
 					$resultJson = json_encode( $results );
-					$callback = $_GET['callback'];
-					echo $callback . '(' . $resultJson . ')';
+					if (isset($_GET['callback'])) {
+						$callback = $_GET['callback'];
+						echo $callback . '(' . $resultJson . ')';
+					}
+					else {
+						echo $resultJson;
+					}
 					exit;
 				break;
 				default:
