@@ -27,7 +27,7 @@ import: contains read_cif.php which will import the appropriate data for you. Be
 
 DB schema:
 
-Metro: http://wiki.github.com/robelkin/translink/metro-db-schema
+Metro: metro/import/metro_schema.sql
 
 Create a .htaccess file in the api folder you would like to use, and put the following information in it:
 
