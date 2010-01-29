@@ -29,11 +29,9 @@ DB schema:
 
 Metro: metro/import/metro_schema.sql
 
-Create a .htaccess file in the api folder you would like to use, and put the following information in it:
+.htaccess:
 
-RewriteEngine on
-
-rewriteRule (.*) handler.php?q=$1 [L]
+When uploading to your server, make sure that the file metro/api/.htaccess has been included.
 
 Then, you should be able to go to www.webhost.com/translink/metro/api/<methods and junk> to access the metro api, and nirailways for the nir api
 
