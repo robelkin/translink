@@ -27,8 +27,7 @@ class Stop extends Base
 					$data = new DataHelper( "tblStop", "StopReference" );
 					$data->LoadRecord($this->params['stopref']);
 					$resultJson = json_encode($data->data);
-					$callback = $_GET[callback];
-					echo $callback . '(' . $resultJson . ')';
+					$this->send_json_output($resultJson);
 					exit;
 				break;
 				case "RoutesForStop":
@@ -39,8 +38,7 @@ class Stop extends Base
 					$sql = sprintf( "SELECT UniqueJourneyIdentifier FROM tblJourneyIntermediate WHERE Location = '%s' GROUP BY UniqueJourneyIdentifier", $this->params['stopref'] );
 					$results = DataHelper::LoadTableFromSql( $sql );
 					$resultJson = json_encode( $results );
-					$callback = $_GET[callback];
-					echo $callback . '(' . $resultJson . ')';
+					$this->send_json_output($resultJson);
 					exit;
 				break;
 				case "NearestStop":
@@ -59,8 +57,7 @@ SIN( PI( ) * '%1$d' /180 ) * SIN( PI( ) * StopLat /180 ) ) + ( COS( PI( ) * '%1$
 						$data = new DataHelper( "tblStop", "StopReference" );
 						$data->LoadRecord( $this->data );
 						$resultJson = json_encode( $data->data );
-						$callback = $_GET[callback];
-						echo $callback . '(' . $resultJson . ')';
+						$this->send_json_output($resultJson);
 						exit;
 					}
 					else
