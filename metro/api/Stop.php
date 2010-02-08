@@ -16,13 +16,18 @@ class Stop extends Base
 			switch( $this->data )
 			{
 				case "IndividualStop":
+					// deprecated - see default case below
+					// want to keep url as tidy as possible
+					// will be removed at some stage
+					// @robertfalconer
 					if( !$this->params['stopref'] )
 					{
 						throw new Exception( "Invalid Params passed", 02 );
 					}
 					$data = new DataHelper( "tblStop", "StopReference" );
 					$data->LoadRecord($this->params['stopref']);
-					print json_encode($data->data);
+					$resultJson = json_encode($data->data);
+					$this->send_json_output($resultJson);
 					exit;
 				break;
 				case "RoutesForStop":
@@ -32,7 +37,8 @@ class Stop extends Base
 					}
 					$sql = sprintf( "SELECT UniqueJourneyIdentifier FROM tblJourneyIntermediate WHERE Location = '%s' GROUP BY UniqueJourneyIdentifier", $this->params['stopref'] );
 					$results = DataHelper::LoadTableFromSql( $sql );
-					print json_encode( $results );
+					$resultJson = json_encode( $results );
+					$this->send_json_output($resultJson);
 					exit;
 				break;
 				case "NearestStop":
@@ -43,10 +49,21 @@ class Stop extends Base
 					$sql = sprintf( "SELECT StopID, StopName, 3963.191 * ACOS( (
 SIN( PI( ) * '%1$d' /180 ) * SIN( PI( ) * StopLat /180 ) ) + ( COS( PI( ) * '%1$d' /180 ) * COS( PI( ) * StopLat /180 ) * COS( PI( ) * StopLong /180 - PI( ) * - '%2$d' /180 ) ) ) AS distance FROM tblStop WHERE distance < '%3$d' ORDER BY distance LIMIT 0 , 30", $this->params['lat'], $this->params['long'], $this->params['distance'] );
 					$results = DataHelper::LoadTableFromSql( $sql );
-					print json_encode( $results);
+					$resultJson = json_encode( $results);
 					exit;
 				default:
-					throw new Exception( "Invalid Object Requested", 03 );
+					if( is_numeric( $this->data ) )
+					{
+						$data = new DataHelper( "tblStop", "StopReference" );
+						$data->LoadRecord( $this->data );
+						$resultJson = json_encode( $data->data );
+						$this->send_json_output($resultJson);
+						exit;
+					}
+					else
+					{	
+						throw new Exception( "Invalid Object Requested", 03 );
+					}
 				break;
 			}
 

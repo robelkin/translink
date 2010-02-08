@@ -17,7 +17,8 @@ class Journey extends Base
 				case "AllRoutes":
 					$sql = "SELECT RouteNumber, RunningBoard, tblJourney.UniqueJourneyIdentifier, Location AS OriginStop FROM tblJourney INNER JOIN tblJourneyOrigin ON (tblJourney.UniqueJourneyIdentifier = tblJourneyOrigin.UniqueJourneyIdentifier)";
 					$results = DataHelper::LoadTableFromSql( $sql );
-					print json_encode( $results );
+					$resultJson = json_encode( $results );
+					$this->send_json_output($resultJson);
 					exit;
 				break;
 				case "StopsOnRoute":
@@ -27,7 +28,8 @@ class Journey extends Base
 					}
 					$sql = sprintf("SELECT * FROM tblJourneyIntermediate WHERE UniqueJourneyIdentifier = '%s'", $this->params['route']);
 					$results = DataHelper::LoadTableFromSql( $sql );
-					print json_encode( $results );
+					$resultJson = json_encode( $results );
+					$this->send_json_output($resultJson);
 					exit;
 				break;
 				case "RouteOrigin":
@@ -37,7 +39,8 @@ class Journey extends Base
 					}
 					$sql = sprintf("SELECT * FROM tblJourneyOrigin INNER JOIN tblStop ON ( tblJourneyOrigin.Location = tblStop.StopReference ) WHERE UniqueJourneyIdentifier = '%s'", $this->params['route']);
 					$results = DataHelper::LoadTableFromSql( $sql );
-					print json_encode( $results );
+					$resultJson = json_encode( $results );
+					$this->send_json_output($resultJson);
 					exit;
 				break;
 				case "RouteDestination":
@@ -47,7 +50,8 @@ class Journey extends Base
 					}
 					$sql = sprintf("SELECT * FROM tblJourneyDestination INNER JOIN tblStop ON ( tblJourneyDestination.Location = tblStop.StopReference ) WHERE UniqueJourneyIdentifier = '%s'", $this->params['route']);
 					$results = DataHelper::LoadTableFromSql( $sql );
-					print json_encode( $results );
+					$resultJson = json_encode( $results );
+					$this->send_json_output($resultJson);
 					exit;
 				break;
 				default:

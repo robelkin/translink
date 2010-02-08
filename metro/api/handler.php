@@ -6,9 +6,48 @@ include_once("Base.php");
 
 try
 {
-	$request = $_SERVER["SCRIPT_NAME"];
+	$_root = substr($_SERVER["SCRIPT_NAME"], 0, strrpos($_SERVER["SCRIPT_NAME"], "/") + 1);
+	$_query = str_ireplace($_root, "", $_SERVER["REQUEST_URI"]);
 
-	list( $blank, $class, $data ) = explode( '/', $request );
+	$requestParts = explode( '?', $_query );
+
+	list( $class, $data ) = explode( '/', $requestParts[0] );
+
+	// deal with GET variables
+	// will always need done - due to how the rewrite is working
+	$_REQUEST = array();
+	$gets = explode( '&', $requestParts[1] );
+
+	foreach( $gets as $get )
+	{
+		$varParts = explode( '=', $get );
+		$_REQUEST[ $varParts[0] ] = $varParts[1];
+	}
+
+	// deal with POST variables
+	if( empty( $_POST ) )
+	{
+		// get the raw data
+		$rawdata = fopen( "php://input", "r" );
+		$raw = "";
+
+		while( $line = fgets( $rawdata ) )
+		{
+		  $raw .= $line;
+		}
+
+		if( $raw != "" )
+		{
+			// parse into $_REQUEST
+			$vars = explode( '&', $raw );
+
+			foreach( $vars as $var )
+			{
+				$params = explode( '=', $var, 2 );
+				$_REQUEST[ $params[0] ] = $params[1];
+			}
+		}
+	}
 
 	if( file_exists($class.".php") )
 	{
