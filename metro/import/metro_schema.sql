@@ -145,4 +145,4 @@ CREATE TABLE IF NOT EXISTS `tblStop` (
   `StopLong` double NOT NULL,
   `StopReference` varchar(50) NOT NULL,
   PRIMARY KEY (`StopID`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
