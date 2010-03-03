@@ -14,7 +14,7 @@ while( $line = fgets( $fh ) )
 	#cuts off line-numbering at beginning of lines. Not sure what it's doing there.
 	$line = substr ($line, -82, 80);
 	
-	if( stripos( $line, "HD" ) !== false )
+	if( substr( $line, 0, 2 ) == "HD" )
 	{
 		if ( substr ( $line, 46, 1 ) != "F" )
 		{
@@ -49,6 +49,7 @@ while( $line = fgets( $fh ) )
 			$helper->data[ 'OperatesOnFridays' ] =  substr( $line, 25, 1 );
 			$helper->data[ 'OperatesOnSaturdays' ] =  substr( $line, 26, 1 );
 			$helper->data[ 'OperatesOnSundays' ] =  substr( $line, 27, 1 );
+			$helper->data[ 'CourseIndicator' ] =  substr( $line, 40, 1 );
 
 			$bankHolidays = substr( $line, 28, 1 );
 			if( $bankHolidays == "X" )
@@ -116,22 +117,94 @@ while( $line = fgets( $fh ) )
 
 			$helper->data[ 'TrainCategory' ] =  substr( $line, 30, 2 );
 			$helper->data[ 'TrainIdentity' ] =  substr( $line, 32, 4 );
-			$helper->data[ 'Headcode' ] =  substr( $line, 36, 4 ); #appears to be unused
-			$helper->data[ 'CourseIndicator' ] =  substr( $line, 40, 1 ); #appears to be unused
-			$helper->data[ 'TrainServiceCode' ] =  substr( $line, 41, 8 ); #appears to be unused
-			$helper->data[ 'BusinessSector' ] =  substr( $line, 49, 1 ); #appears to be unused
-			$helper->data[ 'PowerType' ] =  substr( $line, 50, 3 ); #appears to be unused - value doesn't match spec
-			$helper->data[ 'TimingLoad' ] =  substr( $line, 53, 4 ); #appears to be unused
-			$helper->data[ 'Speed' ] =  substr( $line, 57, 3 ); #appears to be unused
-			$helper->data[ 'OperatingCharacteristics' ] =  substr( $line, 57, 3 ); #appears to be unused
-			$helper->data[ 'TrainClass' ] =  substr( $line, 66, 1 ); #appears to be unused - apparently all trains have first class & standard seating
-			$helper->data[ 'Sleepers' ] =  substr( $line, 67, 1 ); #appears to be unused
-			$helper->data[ 'Reservations' ] =  substr( $line, 68, 1 ); #appears to be unused
-			$helper->data[ 'ConnectionIndicator' ] =  substr( $line, 69, 1 ); #appears to be unused
-			$helper->data[ 'CateringCode' ] =  substr( $line, 70, 4 ); #appears to be unused
-			$helper->data[ 'ServiceBranding' ] =  substr( $line, 74, 4 ); #appears to be unused
-			#$helper->data[ '' ] =  substr( $line, 75, 1 ); #sparechar
-			$helper->data[ 'STPIndicator' ] =  substr( $line, 79, 1 ); #appears to be unused
+			$helper->data[ 'Headcode' ] =  substr( $line, 36, 4 );
+			$helper->data[ 'TrainServiceCode' ] =  substr( $line, 41, 8 );
+			$helper->data[ 'PowerType' ] =  substr( $line, 50, 3 );
+			$helper->data[ 'TimingLoad' ] =  substr( $line, 53, 4 );
+			$helper->data[ 'Speed' ] =  substr( $line, 57, 3 );
+						
+			$connindicator = substr( $line, 69, 1 );
+			if( $connindicator == "C" )
+			{
+				$helper->data[ 'ConnectionIndicator' ] = 'Connections not allowed into this train';
+			}
+			elseif( $connindicator == "S" )
+			{
+				$helper->data[ 'ConnectionIndicator' ] = 'Connections not allowed out of this train';
+			}
+			elseif( $connindicator == "X" )
+			{
+				$helper->data[ 'ConnectionIndicator' ] = 'Connections not allowed at all';
+			}
+			else
+			{
+				$helper->data[ 'ConnectionIndicator' ] = '';
+			}
+			
+			
+			$trainclass = substr( $line, 66, 1 );
+			if( $trainclass == "" OR $trainclass == "B" )
+			{
+				$helper->data[ 'TrainClass' ] = 'First & Standard seats';
+			}
+			elseif( $trainclass == "S" )
+			{
+				$helper->data[ 'TrainClass' ] = 'Standard class only';
+			}
+			else
+			{
+				$helper->data[ 'TrainClass' ] = '';
+			}
+			
+			$reservations = substr( $line, 68, 1 );
+			if( $reservations == "A" )
+			{
+				$helper->data[ 'Reservations' ] = 'Seat Reservations Compulsory';
+			}
+			elseif( $reservations == "E" )
+			{
+				$helper->data[ 'Reservations' ] = 'Seat Reservations for Bicycles Essential';
+			}
+			elseif( $reservations == "R" )
+			{
+				$helper->data[ 'Reservations' ] = 'Seat Reservations Recommended';
+			}
+			elseif( $reservations == "S" )
+			{
+				$helper->data[ 'Reservations' ] = 'Seat Reservations possible from any station';
+			}
+			else
+			{
+				$helper->data[ 'Reservations' ] = '';
+			}
+			
+			$sleepers = substr( $line, 67, 1 );
+			if( $sleepers == "B" )
+			{
+				$helper->data[ 'Sleepers' ] = 'First & Standard Class';
+			}
+			elseif( $sleepers == "F" )
+			{
+				$helper->data[ 'Sleepers' ] = 'First Class only';
+			}
+			elseif( $sleepers == "S" )
+			{
+				$helper->data[ 'Sleepers' ] = 'Standard Class only';
+			}
+			else
+			{
+				$helper->data[ 'Sleepers' ] = '';
+			}
+			
+			$bussec = substr( $line, 49, 1 );
+			if( $bussec == "Z" )
+			{
+				$helper->data[ 'BusinessSector' ] = 'Train may be used to convey Red Star parcels';
+			}
+			else
+			{
+				$helper->data[ 'BusinessSector' ] = '';
+			}
 			
 			$stpindicator = substr( $line, 79, 1 );
 			if( $stpindicator == "C" )
@@ -150,22 +223,118 @@ while( $line = fgets( $fh ) )
 			{
 				$helper->data[ 'STPIndicator' ] = "Permanent";
 			}
-			else
+			elseif ($stpindicator == " ")
 			{
 				$helper->data[ 'STPIndicator' ] = "if non overlay user"; #?
 			}
+			else
+			{
+				$helper->data[ 'STPIndicator' ] = ""; 
+			}
 			
 			$helper->SaveRecord();
+			$operchar = str_split( substr( $line, 57, 3 ), 1 );
+			foreach ( $operchar as $curr ) {
+				$curr = trim ( $curr );
+				if( !empty ( $curr ) )
+				{
+					$helper2 = new DataHelper( "tblOperChars", "OperCharsID" );
+					$helper2->data[ 'JourneyOriginID' ] = $helper->data [ 'JourneyOriginID' ];
+					$helper2->data[ 'OperChar' ] = $curr;
+					$helper2->SaveRecord();
+				}
+			}
+			
+			$catering = str_split( substr( $line, 70, 4 ), 1 );
+			foreach ( $catering as $curr ) {
+				$curr = trim ( $curr );
+				if( $curr == "C" )
+				{
+					$curr = "Buffet Service";
+				}
+				elseif( $curr == "F")
+				{
+					$curr = "Restaurant Car available for First Class passengers";
+				}
+				elseif( $curr =="H")
+				{
+					$curr = "Service of hot food available";
+				}
+				elseif ($curr == "M")
+				{
+					$curr = "Meal included for First Class passengers";
+				}
+				elseif ($curr == "P")
+				{
+					$curr = "Wheelchair only reservations";
+				}
+				elseif ($curr == "R")
+				{
+					$curr = "Restaurant";
+				}
+				elseif ($curr == "T")
+				{
+					$curr = "Trolley Service";
+				}
+				else
+				{
+					$curr = "";
+				}
+
+				if( !empty ( $curr ) )
+				{
+					$helper2 = new DataHelper( "tblCateringCodes", "CateringCodesID" );
+					$helper2->data[ 'JourneyOriginID' ] = $helper->data [ 'JourneyOriginID' ];
+					$helper2->data[ 'CateringCode' ] = $curr;
+					$helper2->SaveRecord();
+				}
+			}
+			
+			$servicebranding = str_split( substr( $line, 74, 4 ), 1 );
+			foreach ( $servicebranding as $curr ) {
+				$curr = trim ( $curr );
+				if( !empty ( $curr ) )
+				{
+					$helper2 = new DataHelper( "tblServiceBranding", "ServiceBrandingID" );
+					$helper2->data[ 'JourneyOriginID' ] = $helper->data [ 'JourneyOriginID' ];
+					if ( $curr == 'E' )
+					{
+						$helper2->data[ 'ServiceBranding' ] = 'Eurostar';
+					}
+					elseif ($curr == 'U')
+					{
+						$helper2->data[ 'ServiceBranding' ] = 'Alphaline';
+					}
+					else
+					{
+						$helper2->data[ 'ServiceBranding' ] = $curr;
+					}
+					$helper2->SaveRecord();
+				}
+			}
+			
 			$lastJourney = $helper->data[ 'UniqueJourneyIdentifier' ];
 		break;
 
 		case "BX":
 			$helper = new DataHelper( "tblJourney", "UniqueJourneyIdentifier" );
 			$helper->data[ 'UniqueJourneyIdentifier' ] = $lastJourney;
-			#$helper->data[ 'TractionClass' ] = substr( $line, 2, 4 ); #unused
 			$helper->data[ 'UICCode' ] = substr( $line, 6, 5 );
 			$helper->data[ 'ATOCCode' ] = substr( $line, 11, 2 );
-			$helper->data[ 'ApplicableTimetableCode' ] = substr( $line, 13, 1 );
+			
+			$atc = substr( $line, 13, 1 );
+			if ( $atc == "Y" )
+			{
+				$helper->data[ 'ApplicableTimetableCode' ] = 'Train is subject to performance monitoring';
+			}
+			elseif ( $atc == "N" )
+			{
+				$helper->data[ 'ApplicableTimetableCode' ] = 'Train is not subject to performance monitoring';
+			}
+			else
+			{
+				$helper->data[ 'ApplicableTimetableCode' ] = $atc;
+			}
 			#$helper->data[ 'RSID' ] = substr( $line, 14, 8 ); #reserved field?
 			#$helper->data[ 'DataSource' ] = substr( $line, 22, 1 ); #reserved field?
 			$helper->SaveRecord();
@@ -180,9 +349,9 @@ while( $line = fgets( $fh ) )
 			$helper->data[ 'PublicDeparture' ] = ParseTime( substr( $line, 15, 4 ) );
 			$helper->data[ 'Platform' ] = substr( $line, 19, 3 );
 			$helper->data[ 'Line' ] = substr( $line, 22, 3 );
-			$helper->data[ 'EngineeringAllowance' ] = ParseWait( $line, 25, 2 );
-			$helper->data[ 'PathingAllowance' ] = ParseWait( $line, 27, 2 );
-			$helper->data[ 'PerformanceAllowance' ] = ParseWait( $line, 41, 2 );
+			$helper->data[ 'EngineeringAllowance' ] = ParseWait( substr ($line, 25, 2) );
+			$helper->data[ 'PathingAllowance' ] = ParseWait( substr ($line, 27, 2) );
+			$helper->data[ 'PerformanceAllowance' ] = ParseWait( substr ($line, 41, 2) );
 			
 			$helper->SaveRecord();
 			$lastLocation = $helper->data[ 'Location' ];
@@ -194,7 +363,7 @@ while( $line = fgets( $fh ) )
 				if( !empty ( $act ) )
 				{
 					$helper2 = new DataHelper( "tblActivity", "ActivityID" );
-					$helper2->data[ 'ActivityID' ] = $helper->data [ 'JourneyOriginID' ];
+					$helper2->data[ 'JourneyOriginID' ] = $helper->data [ 'JourneyOriginID' ];
 					$helper2->data[ 'Activity' ] = $act;
 					$helper2->SaveRecord();
 				}
@@ -229,7 +398,7 @@ while( $line = fgets( $fh ) )
 				if( !empty ( $act ) )
 				{
 					$helper2 = new DataHelper( "tblActivity", "ActivityID" );
-					$helper2->data[ 'ActivityID' ] = $helper->data [ 'JourneyIntermediateID' ];
+					$helper2->data[ 'JourneyOriginID' ] = $helper->data [ 'JourneyIntermediateID' ];
 					$helper2->data[ 'Activity' ] = $act;
 					$helper2->SaveRecord();
 				}
@@ -257,7 +426,7 @@ while( $line = fgets( $fh ) )
 				if( !empty ( $act ) )
 				{
 					$helper2 = new DataHelper( "tblActivity", "ActivityID" );
-					$helper2->data[ 'ActivityID' ] = $helper->data [ 'JourneyDestinationID' ];
+					$helper2->data[ 'JourneyIntermediateID' ] = $helper->data [ 'JourneyDestinationID' ];
 					$helper2->data[ 'Activity' ] = $act;
 					$helper2->SaveRecord();
 				}
@@ -272,27 +441,226 @@ while( $line = fgets( $fh ) )
 			$helper->data[ 'TrainCategory' ] =  substr( $line, 10, 2 );
 			$helper->data[ 'TrainIdentity' ] =  substr( $line, 12, 4 );
 			$helper->data[ 'Headcode' ] =  substr( $line, 16, 4 );
-			#$helper->data[ 'CourseIndicator' ] =  substr( $line, 20, 1 ); #unused
+			$helper->data[ 'CourseIndicator' ] =  substr( $line, 20, 1 );
 			$helper->data[ 'TrainServiceCode' ] =  substr( $line, 21, 8 );
-			$helper->data[ 'BusinessSector' ] =  substr( $line, 29, 1 );
 			$helper->data[ 'PowerType' ] =  substr( $line, 30, 3 );
 			$helper->data[ 'TimingLoad' ] =  substr( $line, 33, 4 );
 			$helper->data[ 'Speed' ] =  substr( $line, 37, 3 );
-			$helper->data[ 'OperatingCharacteristics' ] =  substr( $line, 40, 3 ); #appears to be unused
-			$helper->data[ 'TrainClass' ] =  substr( $line, 46, 1 ); #appears to be unused - apparently all trains have first class & standard seating
-			$helper->data[ 'Sleepers' ] =  substr( $line, 47, 1 ); #appears to be unused
-			$helper->data[ 'Reservations' ] =  substr( $line, 48, 1 ); #appears to be unused
-			#$helper->data[ 'ConnectionIndicator' ] =  substr( $line, 49, 1 ); #appears to be unused
-			$helper->data[ 'CateringCode' ] =  substr( $line, 50, 4 ); #appears to be unused
-			$helper->data[ 'ServiceBranding' ] =  substr( $line, 54, 4 ); #appears to be unused
-			#$helper->data[ '' ] =  substr( $line, 75, 1 ); #sparechar
-						
+			
+			$sleepers = substr( $line, 47, 1 );
+			if( $sleepers == "B" )
+			{
+				$helper->data[ 'Sleepers' ] = 'First & Standard Class';
+			}
+			elseif( $sleepers == "F" )
+			{
+				$helper->data[ 'Sleepers' ] = 'First Class only';
+			}
+			elseif( $sleepers == "S" )
+			{
+				$helper->data[ 'Sleepers' ] = 'Standard Class only';
+			}
+			else
+			{
+				$helper->data[ 'Sleepers' ] = '';
+			}
+			
+			$connindicator = substr( $line, 49, 1 );
+			if( $connindicator == "C" )
+			{
+				$helper->data[ 'ConnectionIndicator' ] = 'Connections not allowed into this train';
+			}
+			elseif( $connindicator == "S" )
+			{
+				$helper->data[ 'ConnectionIndicator' ] = 'Connections not allowed out of this train';
+			}
+			elseif( $connindicator == "X" )
+			{
+				$helper->data[ 'ConnectionIndicator' ] = 'Connections not allowed at all';
+			}
+			else
+			{
+				$helper->data[ 'ConnectionIndicator' ] = '';
+			}
+			
+			
+			$trainclass = substr( $line, 46, 1 );
+			if( $trainclass == "" OR $trainclass == "B" )
+			{
+				$helper->data[ 'TrainClass' ] = 'First & Standard seats';
+			}
+			elseif( $trainclass == "S" )
+			{
+				$helper->data[ 'TrainClass' ] = 'Standard class only';
+			}
+			else
+			{
+				$helper->data[ 'TrainClass' ] = '';
+			}
+			
+			$reservations = substr( $line, 48, 1 );
+			if( $reservations == "A" )
+			{
+				$helper->data[ 'Reservations' ] = 'Seat Reservations Compulsory';
+			}
+			elseif( $reservations == "E" )
+			{
+				$helper->data[ 'Reservations' ] = 'Seat Reservations for Bicycles Essential';
+			}
+			elseif( $reservations == "R" )
+			{
+				$helper->data[ 'Reservations' ] = 'Seat Reservations Recommended';
+			}
+			elseif( $reservations == "S" )
+			{
+				$helper->data[ 'Reservations' ] = 'Seat Reservations possible from any station';
+			}
+			else
+			{
+				$helper->data[ 'Reservations' ] = '';
+			}
+			
+			$sleepers = substr( $line, 67, 1 );
+			if( $sleepers == "B" )
+			{
+				$helper->data[ 'Sleepers' ] = 'First & Standard Class';
+			}
+			elseif( $sleepers == "F" )
+			{
+				$helper->data[ 'Sleepers' ] = 'First Class only';
+			}
+			elseif( $sleepers == "S" )
+			{
+				$helper->data[ 'Sleepers' ] = 'Standard Class only';
+			}
+			else
+			{
+				$helper->data[ 'Sleepers' ] = '';
+			}
+			
+			$bussec = substr( $line, 29, 1 );
+			if( $bussec == "Z" )
+			{
+				$helper->data[ 'BusinessSector' ] = 'Train may be used to convey Red Star parcels';
+			}
+			else
+			{
+				$helper->data[ 'BusinessSector' ] = '';
+			}
+			
+			$stpindicator = substr( $line, 79, 1 );
+			if( $stpindicator == "C" )
+			{
+				$helper->data[ 'STPIndicator' ] = "STP Cancellation of Permanent schedule"; #wording from ATOC spec
+			}
+			elseif( $stpindicator == "N" )
+			{
+				$helper->data[ 'STPIndicator' ] = "New STP schedule (not an overlay)";
+			}
+			elseif( $stpindicator == "O" )
+			{
+				$helper->data[ 'STPIndicator' ] = "STP overlay of Permanent schedule";
+			}
+			elseif( $stpindicator == "P" )
+			{
+				$helper->data[ 'STPIndicator' ] = "Permanent";
+			}
+			elseif( $stpindicator == " ")
+			{
+				$helper->data[ 'STPIndicator' ] = "if non overlay user"; #?
+			}
+			else
+			{
+				$helper->data[ 'STPIndicator' ] = ""; 
+			}
+			
+			$helper->SaveRecord();
+			$operchar = str_split( substr( $line, 40, 3 ), 1 );
+			foreach ( $operchar as $curr ) {
+				$curr = trim ( $curr );
+				if( !empty ( $curr ) )
+				{
+					$helper2 = new DataHelper( "tblOperChars", "JourneyOriginID" );
+					$helper2->data[ 'JourneyOriginID' ] = $helper->data [ 'JourneyOriginID' ];
+					$helper2->data[ 'OperChar' ] = $curr;
+					$helper2->SaveRecord();
+				}
+			}
+			
+			$catering = str_split( substr( $line, 50, 4 ), 1 );
+			foreach ( $catering as $curr ) {
+				$curr = trim ( $curr );
+				if( $curr == "C" )
+				{
+					$curr = "Buffet Service";
+				}
+				elseif( $curr == "F")
+				{
+					$curr = "Restaurant Car available for First Class passengers";
+				}
+				elseif( $curr =="H")
+				{
+					$curr = "Service of hot food available";
+				}
+				elseif ($curr == "M")
+				{
+					$curr = "Meal included for First Class passengers";
+				}
+				elseif ($curr == "P")
+				{
+					$curr = "Wheelchair only reservations";
+				}
+				elseif ($curr == "R")
+				{
+					$curr = "Restaurant";
+				}
+				elseif ($curr == "T")
+				{
+					$curr = "Trolley Service";
+				}
+				else
+				{
+					$curr = "";
+				}
+
+				if( !empty ( $curr ) )
+				{
+					$helper2 = new DataHelper( "tblCateringCodes", "JourneyOriginID" );
+					$helper2->data[ 'JourneyOriginID' ] = $helper->data [ 'JourneyOriginID' ];
+					$helper2->data[ 'CateringCode' ] = $curr;
+					$helper2->SaveRecord();
+				}
+			}
+			
+			$servicebranding = str_split( substr( $line, 54, 4 ), 1 );
+			foreach ( $servicebranding as $curr ) {
+				$curr = trim ( $curr );
+				if( !empty ( $curr ) )
+				{
+					$helper2 = new DataHelper( "tblServiceBranding", "JourneyOriginID" );
+					$helper2->data[ 'JourneyOriginID' ] = $helper->data [ 'JourneyOriginID' ];
+					if ( $curr == 'E' )
+					{
+						$helper2->data[ 'ServiceBranding' ] = 'Eurostar';
+					}
+					elseif ($curr == 'U')
+					{
+						$helper2->data[ 'ServiceBranding' ] = 'Alphaline';
+					}
+					else
+					{
+						$helper2->data[ 'ServiceBranding' ] = $curr;
+					}
+					$helper2->SaveRecord();
+				}
+			}
 			$helper->SaveRecord();
 		break;
 		
 		# TN line currently not in use
 		case "TN":
 			$helper = new DataHelper( "tblTrainNote", "TrainNoteID" );
+			$helper->data[ 'UniqueJourneyIdentifier' ] = $lastJourney;
 			$helper->data[ 'Note' ] = substr( $line, 3, 77 );
 						
 			$notetype = substr( $line, 2, 1 );
@@ -328,7 +696,7 @@ while( $line = fgets( $fh ) )
 		break;
 		
 		case "AA":
-			$helper = new DataHelper ( "tblAssociation", "AssociationID");
+			$helper = new DataHelper ( "tblAssociations", "AssociationID");
 			$helper->data[ 'MainTrainID' ] = substr ( $line, 4, 6);
 			$helper->data[ 'AssociatedTrainID' ] = substr ( $line, 10, 6);
 			$helper->data[ 'AssociationStartDate' ] = ParseDate ( substr ( $line, 16, 6) );
@@ -394,9 +762,13 @@ while( $line = fgets( $fh ) )
 			{
 				$helper->data[ 'STPIndicator' ] = "Permanent assoc";
 			}
-			else
+			elseif( $stpindicator == " " )
 			{
 				$helper->data[ 'STPIndicator' ] = "if non overlay user"; #?
+			}
+			else
+			{
+				$helper->data[ 'STPIndicator' ] = "";
 			}
 			
 			$helper->SaveRecord();
@@ -411,30 +783,10 @@ while( $line = fgets( $fh ) )
 			$helper->data[ 'TPSDescription' ] = substr ( $line, 18, 26 );
 			$helper->data[ 'Stanox' ] = substr ( $line, 44, 5 );
 			$helper->data[ 'CRSCode' ] = substr ( $line, 53, 3 );
-			$helper->data[ 'CAPRIDescripion' ] = substr ( $line, 56, 16 );
+			$helper->data[ 'CAPRIDescription' ] = substr ( $line, 56, 16 );
 			#Lat/long?
 			$helper->SaveRecord();
-		
-		case "TA": #amends a previous location entry to replace with new details/new location code. BEWARE! May require rethinking
-			$helper = new DataHelper ( "tblLocation", "Location" );
-			$newtiploc = trim ( substr ( $line, 72, 7 ) );
-			if( !empty ( $newtiploc ) )
-			{
-				$helper->data[ 'Location' ] = substr ( $line, 72, 7 );
-			}
-			else
-			{
-				$helper->data[ 'Location' ] = substr ( $line, 2, 7 );
-			}
-			$helper->data[ 'CapitalsIdentification' ] = substr ( $line, 9, 2 );
-			$helper->data[ 'Nalco' ] = substr ( $line, 11, 6 );
-			$helper->data[ 'NLCCheckCharacter' ] = substr ( $line, 17, 1 );
-			$helper->data[ 'TPSDescription' ] = substr ( $line, 18, 26 );
-			$helper->data[ 'Stanox' ] = substr ( $line, 44, 5 );
-			$helper->data[ 'CRSCode' ] = substr ( $line, 53, 3 );
-			$helper->data[ 'CAPRIDescripion' ] = substr ( $line, 56, 16 );
-			#Lat/long?
-			$helper->SaveRecord();
+		break;
 	}
 }
 
@@ -442,9 +794,9 @@ while( $line = fgets( $fh ) )
 // half minutes and creates a mysql string
 function ParseWait( $time )
 {
-	if( substr( $time, 2, 1 ) == 'H')
+	if( substr( $time, 1, 1 ) == 'H')
 	{
-		return "00:".substr( $time, 1, 1 ).":30";
+		return "00:0".substr( $time, 0, 1 ).":30";
 	}
 	else
 	{
@@ -457,9 +809,9 @@ function ParseWait( $time )
 //  and creates a mysql formatted string
 function ParseDate( $date )
 {
-	$day = substr( $date, 0, 2 );
+    $year = ( substr( $date, 0, 2 ) < 60 ? "20" . substr( $date, 0, 2 ) : "19" . substr( $date, 0, 2 ) );
     $month = substr( $date, 2, 2 );
-    $year = ( substr( $date, 4, 2 ) < 60 ? "20" . substr( $date, 4, 2 ) : "19" . substr( $date, 4, 2 ) );
+	$day = substr( $date, 4, 2 );
 
     return $year."-".$month."-".$day;
 }
