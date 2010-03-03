@@ -55,7 +55,7 @@ class DataHelper
 			{
 				if( in_array( $key, $this->fields ) )
 				{
-					$setString = $key." = '".mysql_real_escape_string( $value )."', ";
+					$setString .= $key." = '".mysql_real_escape_string( $value )."', ";
 				}
 			}
 
