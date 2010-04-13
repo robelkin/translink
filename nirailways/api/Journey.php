@@ -29,7 +29,7 @@ class Journey extends Base
     
     private function AllRoutes( $data )
     {
-        $sql = "SELECT RouteNumber, RunningBoard, tblJourney.UniqueJourneyIdentifier, Location AS OriginStop FROM tblJourney INNER JOIN tblJourneyOrigin ON (tblJourney.UniqueJourneyIdentifier = tblJourneyOrigin.UniqueJourneyIdentifier)";
+        $sql = "SELECT tblJourney.UniqueJourneyIdentifier, Location AS OriginStop FROM tblJourney INNER JOIN tblJourneyOrigin ON (tblJourney.UniqueJourneyIdentifier = tblJourneyOrigin.UniqueJourneyIdentifier)";
         $results = DataHelper::LoadTableFromSql( $sql );
         $resultJson = json_encode( $results );
         $this->send_json_output($resultJson);
@@ -57,7 +57,7 @@ class Journey extends Base
             throw new Exception( "Invalid Params passed", 02 );
         }
         
-        $sql = sprintf( "SELECT * FROM tblJourneyOrigin INNER JOIN tblStop ON ( tblJourneyOrigin.Location = tblStop.StopReference ) WHERE UniqueJourneyIdentifier = '%s'", mysql_real_escape_string( $data ) );
+        $sql = sprintf( "SELECT * FROM tblJourneyOrigin INNER JOIN tblLocation ON ( tblJourneyOrigin.Location = tblLocation.Location ) WHERE UniqueJourneyIdentifier = '%s'", mysql_real_escape_string( $data ) );
         $results = DataHelper::LoadTableFromSql( $sql );
         $resultJson = json_encode( $results );
         $this->send_json_output( $resultJson );
@@ -71,7 +71,7 @@ class Journey extends Base
             throw new Exception( "Invalid Params passed", 02 );
         }
         
-        $sql = sprintf( "SELECT * FROM tblJourneyDestination INNER JOIN tblStop ON ( tblJourneyDestination.Location = tblStop.StopReference ) WHERE UniqueJourneyIdentifier = '%s'", mysql_real_escape_string( $data ) );
+        $sql = sprintf( "SELECT * FROM tblJourneyDestination INNER JOIN tblLocation ON ( tblJourneyDestination.Location = tblLocation.Location ) WHERE UniqueJourneyIdentifier = '%s'", mysql_real_escape_string( $data ) );
         $results = DataHelper::LoadTableFromSql( $sql );
         $resultJson = json_encode( $results );
         $this->send_json_output( $resultJson );

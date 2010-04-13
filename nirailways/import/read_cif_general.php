@@ -12,8 +12,8 @@ $fh = fopen( $file, "r" );
 while( $line = fgets( $fh ) )
 {
 	#cuts off line-numbering at beginning of lines. Not sure what it's doing there.
-	$line = substr ($line, -82, 80);
-	
+	$line = substr ($line, -81, 80);
+
 	if( substr( $line, 0, 2 ) == "HD" )
 	{
 		if ( substr ( $line, 46, 1 ) != "F" )
@@ -30,7 +30,7 @@ while( $line = fgets( $fh ) )
 		$helper->data[ 'UniqueFileReference' ] = substr( $line, 32, 7 );
 		$helper->SaveRecord();
 
-		continue;
+	
 	}
 
 	$headerCode = substr( $line, 0, 2 );
@@ -39,7 +39,7 @@ while( $line = fgets( $fh ) )
 	{
 		case "BS":
 			$helper = new DataHelper( "tblJourney", "UniqueJourneyIdentifier" );
-			$helper->data[ 'UniqueJourneyIdentifier' ] = substr( $line, 3, 6 );
+			$helper->data[ 'ProviderJourneyIdentifier' ] = substr( $line, 3, 6 );
 			$helper->data[ 'FirstDateOfOperation' ] = ParseDate( substr( $line, 9, 6 ) );
 			$helper->data[ 'LastDateOfOperation' ] = ParseDate( substr( $line, 15, 6 ) );
 			$helper->data[ 'OperatesOnMondays' ] = substr( $line, 21, 1 );
@@ -314,11 +314,13 @@ while( $line = fgets( $fh ) )
 			}
 			
 			$lastJourney = $helper->data[ 'UniqueJourneyIdentifier' ];
+			$lastProvJourney = $helper->data[ 'ProviderJourneyIdentifier' ];
 		break;
 
 		case "BX":
 			$helper = new DataHelper( "tblJourney", "UniqueJourneyIdentifier" );
 			$helper->data[ 'UniqueJourneyIdentifier' ] = $lastJourney;
+			$helper->data[ 'ProviderJourneyIdentifier' ] = $lastProvJourney;
 			$helper->data[ 'UICCode' ] = substr( $line, 6, 5 );
 			$helper->data[ 'ATOCCode' ] = substr( $line, 11, 2 );
 			
@@ -343,12 +345,13 @@ while( $line = fgets( $fh ) )
 		case "LO":
 			$helper = new DataHelper( "tblJourneyOrigin", "JourneyOriginID" );
 			$helper->data[ 'UniqueJourneyIdentifier' ] = $lastJourney;
+			$helper->data[ 'ProviderJourneyIdentifier' ] = $lastProvJourney;
 			$helper->data[ 'Location' ] = substr( $line, 2, 7 );
 			$helper->data[ 'LocationSuffix' ] = substr( $line, 9, 1 );
 			$helper->data[ 'ScheduledDeparture' ] = ParseTime( substr( $line, 10, 5 ) );
 			$helper->data[ 'PublicDeparture' ] = ParseTime( substr( $line, 15, 4 ) );
-			$helper->data[ 'Platform' ] = substr( $line, 19, 3 );
-			$helper->data[ 'Line' ] = substr( $line, 22, 3 );
+			$helper->data[ 'Platform' ] = trim(substr( $line, 19, 3 ));
+			$helper->data[ 'Line' ] = trim(substr( $line, 22, 3 ));
 			$helper->data[ 'EngineeringAllowance' ] = ParseWait( substr ($line, 25, 2) );
 			$helper->data[ 'PathingAllowance' ] = ParseWait( substr ($line, 27, 2) );
 			$helper->data[ 'PerformanceAllowance' ] = ParseWait( substr ($line, 41, 2) );
@@ -363,7 +366,7 @@ while( $line = fgets( $fh ) )
 				if( !empty ( $act ) )
 				{
 					$helper2 = new DataHelper( "tblActivity", "ActivityID" );
-					$helper2->data[ 'JourneyOriginID' ] = $helper->data [ 'JourneyOriginID' ];
+					$helper2->data[ 'JourneyID' ] = $helper->data [ 'JourneyOriginID' ];
 					$helper2->data[ 'Activity' ] = $act;
 					$helper2->SaveRecord();
 				}
@@ -373,6 +376,7 @@ while( $line = fgets( $fh ) )
 		case "LI":
 			$helper = new DataHelper( "tblJourneyIntermediate", "JourneyIntermediateID" );
 			$helper->data[ 'UniqueJourneyIdentifier' ] = $lastJourney;
+			$helper->data[ 'ProviderJourneyIdentifier' ] = $lastProvJourney;
 			$helper->data[ 'Location' ] = substr( $line, 2, 7 );
 			$helper->data[ 'LocationSuffix' ] = substr( $line, 9, 1 );
 			$helper->data[ 'ScheduledArrival' ] = ParseTime( substr( $line, 10, 5 ) );	
@@ -380,9 +384,9 @@ while( $line = fgets( $fh ) )
 			$helper->data[ 'ScheduledPass' ] = ParseTime( substr( $line, 20, 5 ) );	
 			$helper->data[ 'PublicArrival' ] = ParseTime( substr( $line, 25, 4 ) );
 			$helper->data[ 'PublicDeparture' ] = ParseTime( substr( $line, 29, 4 ) );
-			$helper->data[ 'Platform' ] = substr( $line, 33, 3 );
-			$helper->data[ 'Line' ] = substr( $line, 36, 3 );
-			$helper->data[ 'Path' ] = substr( $line, 39, 3 );
+			$helper->data[ 'Platform' ] = trim(substr( $line, 33, 3 ));
+			$helper->data[ 'Line' ] = trim(substr( $line, 36, 3 ));
+			$helper->data[ 'Path' ] = trim(substr( $line, 39, 3 ));
 			$helper->data[ 'EngineeringAllowance' ] = ParseWait( substr( $line, 54, 2 ) );
 			$helper->data[ 'PathingAllowance' ] = ParseWait( substr( $line, 56, 2 ) );
 			$helper->data[ 'PerformanceAllowance' ] = ParseWait( substr( $line, 58, 2 ) );
@@ -398,7 +402,7 @@ while( $line = fgets( $fh ) )
 				if( !empty ( $act ) )
 				{
 					$helper2 = new DataHelper( "tblActivity", "ActivityID" );
-					$helper2->data[ 'JourneyOriginID' ] = $helper->data [ 'JourneyIntermediateID' ];
+					$helper2->data[ 'JourneyID' ] = $helper->data [ 'JourneyIntermediateID' ];
 					$helper2->data[ 'Activity' ] = $act;
 					$helper2->SaveRecord();
 				}
@@ -408,12 +412,13 @@ while( $line = fgets( $fh ) )
 		case "LT":
 			$helper = new DataHelper( "tblJourneyDestination", "JourneyDestinationID" );
 			$helper->data[ 'UniqueJourneyIdentifier' ] = $lastJourney;
+			$helper->data[ 'ProviderJourneyIdentifier' ] = $lastProvJourney;
 			$helper->data[ 'Location' ] = substr( $line, 2, 7 );
 			$helper->data[ 'LocationSuffix' ] = substr( $line, 9, 1 );
 			$helper->data[ 'ScheduledArrival' ] = ParseTime( substr( $line, 10, 5 ) );
 			$helper->data[ 'PublicArrival' ] = ParseTime( substr( $line, 15, 4 ) );
-			$helper->data[ 'Platform' ] = substr( $line, 19, 3 );
-			$helper->data[ 'Path' ] = substr( $line, 22, 3 );
+			$helper->data[ 'Platform' ] = trim(substr( $line, 19, 3 ));
+			$helper->data[ 'Path' ] = trim(substr( $line, 22, 3 ));
 			
 			$helper->SaveRecord();
 			
@@ -426,7 +431,7 @@ while( $line = fgets( $fh ) )
 				if( !empty ( $act ) )
 				{
 					$helper2 = new DataHelper( "tblActivity", "ActivityID" );
-					$helper2->data[ 'JourneyIntermediateID' ] = $helper->data [ 'JourneyDestinationID' ];
+					$helper2->data[ 'JourneyID' ] = $helper->data [ 'JourneyDestinationID' ];
 					$helper2->data[ 'Activity' ] = $act;
 					$helper2->SaveRecord();
 				}
@@ -436,6 +441,7 @@ while( $line = fgets( $fh ) )
 		case "CR":
 			$helper = new DataHelper( "tblTrainChange", "TrainChangeID" );
 			$helper->data[ 'UniqueJourneyIdentifier' ] = substr( $line, 3, 6 );
+			$helper->data[ 'ProviderJourneyIdentifier' ] = $lastProvJourney;
 			$helper->data[ 'Location' ] = substr( $line, 2, 7 );
 			$helper->data[ 'LocationSuffix' ] = substr( $line, 9, 1 );
 			$helper->data[ 'TrainCategory' ] =  substr( $line, 10, 2 );
@@ -695,6 +701,7 @@ while( $line = fgets( $fh ) )
 			$helper->SaveRecord();
 		break;
 		
+		//may need provider/unique fixing
 		case "AA":
 			$helper = new DataHelper ( "tblAssociations", "AssociationID");
 			$helper->data[ 'MainTrainID' ] = substr ( $line, 4, 6);

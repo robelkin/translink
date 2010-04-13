@@ -14,4 +14,4 @@ You can choose from one of the following options: <br /><br />
 <br />
 <br />
 
-<a href="nirailways/import/read_cif.php">Import Railways Data</a>
+<a href="nirailways/import/read_cif_translink.php">Import Railways Data</a>

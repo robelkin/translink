@@ -8,66 +8,153 @@ class Stop extends Base
 		$this->data = $data;
 		$this->params = $params;
 	}
+    
 	public function Get()
 	{
-
 		if( !empty( $this->data ) )
-		{
-			switch( $this->data )
-			{
-				case "IndividualStop":
-					// deprecated - see default case below
-					// want to keep url as tidy as possible
-					// will be removed at some stage
-					// @robertfalconer
-					if( !$this->params['stopref'] )
-					{
-						throw new Exception( "Invalid Params passed", 02 );
-					}
-					$data = new DataHelper( "tblStop", "StopReference" );
-					$data->LoadRecord($this->params['stopref']);
-					$resultJson = json_encode($data->data);
-					$this->send_json_output($resultJson);
-					exit;
-				break;
-				case "RoutesForStop":
-					if( !$this->params['stopref'] )
-					{
-						throw new Exception( "Invalid Params passed", 02 );
-					}
-					$sql = sprintf( "SELECT UniqueJourneyIdentifier FROM tblJourneyIntermediate WHERE Location = '%s' GROUP BY UniqueJourneyIdentifier", $this->params['stopref'] );
-					$results = DataHelper::LoadTableFromSql( $sql );
-					$resultJson = json_encode( $results );
-					$this->send_json_output($resultJson);
-					exit;
-				break;
-				case "NearestStop":
-					if( !$this->params['lat'] || !$this->params['long'] || !$this->params['distance'] )
-					{
-						throw new Exception( "Invalid Params pass", 02 );
-					}
-					$sql = sprintf( "SELECT StopID, StopName, 3963.191 * ACOS( (
-SIN( PI( ) * '%1$d' /180 ) * SIN( PI( ) * StopLat /180 ) ) + ( COS( PI( ) * '%1$d' /180 ) * COS( PI( ) * StopLat /180 ) * COS( PI( ) * StopLong /180 - PI( ) * - '%2$d' /180 ) ) ) AS distance FROM tblStop WHERE distance < '%3$d' ORDER BY distance LIMIT 0 , 30", $this->params['lat'], $this->params['long'], $this->params['distance'] );
-					$results = DataHelper::LoadTableFromSql( $sql );
-					$resultJson = json_encode( $results);
-					exit;
-				default:
-					if( is_numeric( $this->data ) )
-					{
-						$data = new DataHelper( "tblStop", "StopReference" );
-						$data->LoadRecord( $this->data );
-						$resultJson = json_encode( $data->data );
-						$this->send_json_output($resultJson);
-						exit;
-					}
-					else
-					{	
-						throw new Exception( "Invalid Object Requested", 03 );
-					}
-				break;
-			}
+        {
+            if( $this->method_or_data( $this->data ) == "method" )
+            {
+                list( $method, $stuffToPass ) = explode( '/', $this->data, 2 );
+                $this->$method( $stuffToPass );
+            }
+            else
+            {
+                if( is_numeric( $this->data ) )
+                {
+                    $results = new DataHelper( "tblStop", "StopReference" );
+                    $results->LoadRecord( $this->data );
+                    $resultJson = json_encode( $results->data );
+                    $this->send_json_output( $resultJson );
+                    exit;
+                }
+                else
+                {    
+                    throw new Exception( "Invalid Object Requested", 03 );
+                }
+            }
+        }
+        
+        throw new Exception( "Invalid Object Requested", 03 );
+    }
+    
+    private function IndividualStop( $data )
+    {
+        if( $data == "" )
+        {
+            throw new Exception( "Invalid Params passed", 02 );
+        }
+        
+        $results = new DataHelper( "tblStop", "StopReference" );
+        $results->LoadRecord( $data );
+        $resultJson = json_encode( $results->data );
+        $this->send_json_output( $resultJson );
+        exit;
+    }
+    
+    private function RoutesForStop( $data )
+    {
+        if( $data == "" )
+        {
+            throw new Exception( "Invalid Params passed", 02 );
+        }
+        
+        $sql = sprintf( "SELECT UniqueJourneyIdentifier FROM tblJourneyIntermediate WHERE Location = '%s' GROUP BY UniqueJourneyIdentifier", mysql_real_escape_string( $data ) );
+        $results = DataHelper::LoadTableFromSql( $sql );
+        $resultJson = json_encode( $results );
+        $this->send_json_output( $resultJson );
+        exit;
+    }
 
+	private function RouteByNumber( $data )
+	{
+		if( $data == "" )
+		{
+			throw new Exception( "Invalid Params passed", 02 );
 		}
+
+		$sql = sprintf("SELECT RouteNumber, DepartureTime, tblJourney.UniqueJourneyIdentifier, Location AS OriginStop FROM tblJourney INNER JOIN tblJourneyOrigin ON (tblJourney.UniqueJourneyIdentifier = tblJourneyOrigin.UniqueJourneyIdentifier) WHERE RouteNumber='%s'", $data );
+
+		$results = DataHelper::LoadTableFromSql( $sql );
+		$resultJson = json_encode( $results );
+
+		$this->send_json_output($resultJson);
+		exit;
 	}
+    
+    private function NearestStop( $data )
+    {
+        list( $lat, $long, $dist ) = explode( ',', $data, 3 );
+
+        if( $lat == "" || $long == "" || $dist == "" )
+        {
+            throw new Exception( "Invalid Params passed", 02 );
+        }
+        
+list( $lat, $long, $dist ) = explode( ',', $data, 3 );
+
+        if( $lat == "" || $long == "" || $dist == "" )
+        {
+            throw new Exception( "Invalid Params passed", 02 );
+        }
+        
+        $sql = sprintf( 
+        "SELECT 
+            StopID, 
+            StopName, 
+			StopReference,
+            (3963.191 * 
+                ACOS( 
+                    ( 
+                        SIN( 
+                            PI( ) * '%1\$F' /180 
+                        ) * 
+                        SIN( 
+                            PI( ) * StopLat /180 
+                        ) 
+                    ) + 
+                    ( 
+                        COS( 
+                            PI( ) * '%1\$F' /180 
+                        ) * 
+                        COS( 
+                            PI( ) * StopLat /180 
+                        ) * 
+                        COS( 
+                            PI( ) * StopLong /180 - PI( ) * '%2\$F' /180 
+                        ) 
+                    )
+                ) )
+                AS distance 
+                FROM tblStop 
+                WHERE 
+                (3963.191 * 
+                ACOS( 
+                    ( 
+                        SIN( 
+                            PI( ) * '%1\$F' /180 
+                        ) * 
+                        SIN( 
+                            PI( ) * StopLat /180 
+                        ) 
+                    ) + 
+                    ( 
+                        COS( 
+                            PI( ) * '%1\$F' /180 
+                        ) * 
+                        COS( 
+                            PI( ) * StopLat /180 
+                        ) * 
+                        COS( 
+                            PI( ) * StopLong /180 - PI( ) * '%2\$F' /180 
+                        ) 
+                    )
+                )) < %3\$d ORDER BY distance LIMIT 0 , 30", mysql_real_escape_string( $lat ), mysql_real_escape_string( $long ), mysql_real_escape_string( $dist ) );
+
+        $results = DataHelper::LoadTableFromSql( $sql );
+        $resultJson = json_encode( $results );
+        $this->send_json_output( $resultJson );
+        exit;
+    }
 }
 ?>

@@ -1,5 +1,7 @@
 <?
 
+error_reporting( 0 );
+
 include_once("../../library/db.inc.php");
 include_once("../../classes/DataHelper.class.php");
 include_once("Base.php");
@@ -11,7 +13,7 @@ try
 
 	$requestParts = explode( '?', $_query );
 
-	list( $class, $data ) = explode( '/', $requestParts[0] );
+	list( $class, $data ) = explode( '/', $requestParts[0], 2 );
 
 	// deal with GET variables
 	// will always need done - due to how the rewrite is working

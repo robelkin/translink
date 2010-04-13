@@ -6,7 +6,7 @@ class DataHelper
     private $table;
     private $primaryKeyField;
     private $fields;
-
+	
     public function __construct( $table, $primaryKeyField )
     {
         $this->table = $table;

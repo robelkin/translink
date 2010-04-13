@@ -1,0 +1,3 @@
+RewriteEngine On
+
+RewriteRule (.*) handler.php?q=$1 [L]
